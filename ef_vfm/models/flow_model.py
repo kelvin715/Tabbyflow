@@ -88,7 +88,7 @@ class ExpVFM(torch.nn.Module):
     def sample(self, num_samples):
         dev = self.device
         dt = torch.float32
-        d_in = self.num_numerical_features + sum(self.num_classes) + len(self.num_classes)
+        d_in = self.num_numerical_features + sum(self.num_classes)
         d_out = self.num_numerical_features + len(self.num_classes)
 
         x0 = torch.randn(num_samples, d_in, device=dev)
@@ -102,9 +102,9 @@ class ExpVFM(torch.nn.Module):
         if sum(self.num_classes) != 0:
             idx = 0
             for i, val in enumerate(self.num_classes):
-                sample[:, i] = torch.argmax(out[:, idx:idx + val], dim=1)
+                sample[:, self.num_numerical_features + i] = torch.argmax(out[:, idx:idx + val], dim=1)
                 idx += val
-                assert val >= sample[:, i].max() >= 0, f"Sampled value {sample[:, i].max()} is out of range for categorical feature {i} with {val} classes."
+                assert val > sample[:, self.num_numerical_features + i].max() and sample[:, self.num_numerical_features + i].min() >= 0, f"Sampled value {sample[:, self.num_numerical_features + i].max()} is out of range for categorical feature {i} with {val} classes."
 
         return sample.cpu()
     
