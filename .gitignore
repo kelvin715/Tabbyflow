@@ -172,3 +172,5 @@ data/shoppers
 wandb/
 
 *.DS_Store
+
+.venv/
